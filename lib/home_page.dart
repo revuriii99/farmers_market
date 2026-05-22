@@ -1,19 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'category_card.dart';
 import 'product_card.dart';
+import 'app_provider.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final provider = context.watch<AppProvider>();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
           "Farmers",
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
         ),
+        actions: [
+          Stack(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.shopping_cart_outlined),
+                onPressed: () {},
+              ),
+              if (provider.cartCount > 0)
+                Positioned(
+                  right: 6,
+                  top: 6,
+                  child: CircleAvatar(
+                    radius: 8,
+                    backgroundColor: Colors.red,
+                    child: Text(
+                      '${provider.cartCount}',
+                      style: const TextStyle(fontSize: 10, color: Colors.white),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
@@ -22,7 +49,7 @@ class HomePage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             spacing: 24,
             children: [
-
+              // SEARCH BAR
               TextField(
                 decoration: InputDecoration(
                   prefixIcon: const Icon(Icons.search),
@@ -42,6 +69,7 @@ class HomePage extends StatelessWidget {
                 ),
               ),
 
+              // HERO BANNER
               Container(
                 width: double.infinity,
                 height: 160,
@@ -54,6 +82,7 @@ class HomePage extends StatelessWidget {
                 ),
               ),
 
+              // CATEGORIES
               Text(
                 'Categories',
                 style: TextStyle(
@@ -67,15 +96,18 @@ class HomePage extends StatelessWidget {
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   spacing: 12,
-                  children: const [
-                    CategoryCard(title: 'Fruits', imagePath: 'assets/res/fruits.png'),
-                    CategoryCard(title: 'Grains', imagePath: 'assets/res/grains.png'),
-                    CategoryCard(title: 'Herbs', imagePath: 'assets/res/herbs.png'),
-                    CategoryCard(title: 'Milk', imagePath: 'assets/res/milk.png'),
-                  ],
+                  children: [
+                    'Fruits', 'Grains', 'Herbs', 'Milk',
+                  ].map((category) => CategoryCard(
+                    title: category,
+                    imagePath: 'assets/res/${category.toLowerCase()}.png',
+                    isSelected: provider.selectedCategory == category,
+                    onTap: () => context.read<AppProvider>().selectCategory(category),
+                  )).toList(),
                 ),
               ),
 
+              // BROWSE PRODUCTS
               const Text(
                 'Browse Products',
                 style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
@@ -91,10 +123,10 @@ class HomePage extends StatelessWidget {
                   mainAxisExtent: 260,
                 ),
                 children: const [
-                  ProductCard(title: 'Berries', description: '...', imagePath: 'assets/res/berry.png'),
-                  ProductCard(title: 'Tulsi', description: '...', imagePath: 'assets/res/tulsi.png'),
-                  ProductCard(title: 'Milk', description: '...', imagePath: 'assets/res/milk.png'),
-                  ProductCard(title: 'Tomato', description: '...', imagePath: 'assets/res/tomato.png'),
+                  ProductCard(title: 'Berries', description: 'Berries is a sweet fruit with red color.', imagePath: 'assets/res/berry.png'),
+                  ProductCard(title: 'Tulsi', description: 'Leaf of berries is very green and fresh.', imagePath: 'assets/res/tulsi.png'),
+                  ProductCard(title: 'Milk', description: 'Milk is a white liquid produced by mammals.', imagePath: 'assets/res/milk.png'),
+                  ProductCard(title: 'Tomato', description: 'Tomato is a fruit or a vegetable?', imagePath: 'assets/res/tomato.png'),
                 ],
               ),
             ],
